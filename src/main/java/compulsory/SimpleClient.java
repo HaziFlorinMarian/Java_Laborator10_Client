@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 
 public class SimpleClient {
     public static void main (String[] args) throws IOException {
@@ -13,16 +14,23 @@ public class SimpleClient {
         int PORT = 8100; // The server's port
         try (
                 Socket socket = new Socket(serverAddress, PORT);
-                PrintWriter out =
-                        new PrintWriter(socket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader (
-                        new InputStreamReader(socket.getInputStream())) ) {
-// Send a request to the server
-            String request = "World";
-            out.println(request);
-// Wait the response from the server ("Hello World!")
-            String response = in.readLine ();
-            System.out.println(response);
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                BufferedReader in = new BufferedReader (new InputStreamReader(socket.getInputStream()))) {
+
+            while (true) {
+                Scanner scanner = new Scanner(System.in);
+                System.out.println("Enter command: ");
+                String request = scanner.nextLine();
+
+                if (socket.isClosed()) {
+                    System.out.println("Connection with server died!");
+                    break;
+                }
+
+                out.println(request);
+                String response = in.readLine();
+                System.out.println(response);
+            }
         } catch (UnknownHostException e) {
             System.err.println("No server listening... " + e);
         }
